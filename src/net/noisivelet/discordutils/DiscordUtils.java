@@ -43,6 +43,7 @@ public class DiscordUtils {
     public static final Logger logger=Logger.getLogger("DiscordBot");
     public static JDA jda=null;
     public static final HashMap<String, Command> COMANDOS=new HashMap<>();
+    public static final String VERSION="DiscordUtils v0.0";
     public static void main(String[] args) {
         log("Iniciando DiscordUtils...");
         try {
