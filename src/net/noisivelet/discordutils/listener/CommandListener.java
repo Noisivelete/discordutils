@@ -8,6 +8,7 @@ package net.noisivelet.discordutils.listener;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import static net.noisivelet.discordutils.DiscordUtils.COMANDOS;
+import static net.noisivelet.discordutils.DiscordUtils.error;
 import net.noisivelet.discordutils.commands.Command;
 
 /**
@@ -24,7 +25,15 @@ public class CommandListener extends ListenerAdapter{
         if(command==null)
             return;
         
-        command.run(event);
+        try{
+            command.run(event);
+        } catch (Exception e){
+            error("Ha ocurrido un error ejecutando un comando.");
+            error("Comando: "+event.getMessage().getContentRaw());
+            error("Error: "+e.getMessage());
+            e.printStackTrace();
+        }
+        
     }
     
     /**
