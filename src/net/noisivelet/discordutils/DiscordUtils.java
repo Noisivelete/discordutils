@@ -13,6 +13,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.security.auth.login.LoginException;
@@ -29,17 +33,33 @@ import org.reflections.Reflections;
  * @author Francis
  */
 public class DiscordUtils {
-    static{
-        System.setProperty("java.util.logging.SimpleFormatter.format",
-              "[%1$tF %1$tT] [%4$-7s] %5$s %n");
-    }
-    public static void log(String str){logger.log(Level.INFO, str);}
-    public static void error(String str){logger.log(Level.SEVERE, str);}
-    public static void warning(String str){logger.log(Level.WARNING, str);}
-    public static final Logger logger=Logger.getLogger("DiscordBot");
+    public static final Logger logger=Logger.getLogger("DiscordUtils");
+    public static final ExecutorService EXECUTOR=Executors.newCachedThreadPool();
     public static JDA jda=null;
     public static final HashMap<String, Command> COMANDOS=new HashMap<>();
     public static final String VERSION="DiscordUtils v0.0";
+    public static String OCR_KEY=null;
+    static{
+        System.setProperty("java.util.logging.SimpleFormatter.format",
+                "[%1$tF %1$tT] [%4$-7s] %5$s %n");
+        Handler systemOut = new ConsoleHandler();
+        systemOut.setLevel( Level.ALL );
+        logger.addHandler( systemOut );
+        logger.setLevel( Level.ALL );
+        logger.setUseParentHandlers( false );
+    }
+    public static void debug2(String str){logger.log(Level.FINER, str);}
+    public static void debug(String str){logger.log(Level.FINE, str);}
+    public static void log(String str){logger.log(Level.INFO, str);}
+    public static void exception(Exception ex, Level level){
+        logger.log(level, "Mensaje: {0}", ex.getMessage());
+        logger.log(level, "Stack Trace:");
+        for(int i=0;i<ex.getStackTrace().length && i<5;i++){
+            logger.log(level,ex.getStackTrace()[i].toString());
+        }
+    }
+    public static void error(String str){logger.log(Level.SEVERE, str);}
+    public static void warning(String str){logger.log(Level.WARNING, str);}
     public static void main(String[] args) {
         log("Iniciando DiscordUtils...");
         try {
@@ -49,11 +69,23 @@ public class DiscordUtils {
             warning("Cerrando servidor...");
             return;
         }
+        log("Cargando OCR_KEY...");
+        try {
+            loadOCRKey();
+        } catch (IOException | IllegalStateException ex ) {
+            error("No se ha podido leer la OCR Key: " + ex.getMessage());
+            warning("Cerrando servidor...");
+            jda.shutdownNow();
+            return;
+        }
+        
         log("Cargando comandos...");
         loadCommands();
         
         log("Implementando listeners...");
         jda.addEventListener(new CommandListener());
+        
+        log("Todo listo.");
         
     }
 
@@ -110,5 +142,29 @@ public class DiscordUtils {
                 ex.printStackTrace();
             }
         });
+    }
+    
+    public static String[] strToArray(String str){
+        return str.split(" ");
+    }
+
+    private static void loadOCRKey() throws IOException {
+        File tokenFile=new File("key.ocr");
+        
+        if (!tokenFile.exists() || !tokenFile.isFile()){
+            log("El archivo OCR Key \"key.ocr\" no existe. Creando uno nuevo.");
+            tokenFile.createNewFile();
+            throw new IllegalStateException("El bot debe configurarse antes de usarse.");
+        }
+        
+        if(!tokenFile.canRead())
+            throw new IOException("No se puede leer el archivo con la OCR Key.");
+        
+        if(tokenFile.length() == 0)
+            throw new IllegalStateException("El archivo \"key.ocr\" no es un archivo de clave OCR.");
+        
+        try (BufferedReader is = new BufferedReader(new FileReader(tokenFile))) {    
+            OCR_KEY=is.readLine();
+        }
     }
 }

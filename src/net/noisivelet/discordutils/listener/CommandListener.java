@@ -5,10 +5,13 @@
  */
 package net.noisivelet.discordutils.listener;
 
+import java.util.logging.Level;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import static net.noisivelet.discordutils.DiscordUtils.COMANDOS;
 import static net.noisivelet.discordutils.DiscordUtils.error;
+import static net.noisivelet.discordutils.DiscordUtils.exception;
+import static net.noisivelet.discordutils.DiscordUtils.log;
 import net.noisivelet.discordutils.commands.Command;
 
 /**
@@ -25,13 +28,14 @@ public class CommandListener extends ListenerAdapter{
         if(command==null)
             return;
         
+        //Mandar comando ejecutado a consola (Estos son los únicos mensajes que se envían a consola con el bot)
+        log(event.getAuthor().getName()+"#"+event.getAuthor().getDiscriminator()+ " @ #" + event.getChannel().getName() + " (Guild " + event.getGuild().getId() + "): " + event.getMessage().getContentRaw());
         try{
             command.run(event);
         } catch (Exception e){
-            error("Ha ocurrido un error ejecutando un comando.");
+            error("Ha ocurrido un error no capturado ejecutando un comando.");
             error("Comando: "+event.getMessage().getContentRaw());
-            error("Error: "+e.getMessage());
-            e.printStackTrace();
+            exception(e, Level.SEVERE);
         }
         
     }
