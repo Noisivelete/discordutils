@@ -45,7 +45,7 @@ public class DiscordUtils {
         Handler systemOut = new ConsoleHandler();
         systemOut.setLevel( Level.ALL );
         logger.addHandler( systemOut );
-        logger.setLevel( Level.ALL );
+        logger.setLevel( Level.INFO );
         logger.setUseParentHandlers( false );
     }
     public static void debug2(String str){logger.log(Level.FINER, str);}
@@ -61,6 +61,15 @@ public class DiscordUtils {
     public static void error(String str){logger.log(Level.SEVERE, str);}
     public static void warning(String str){logger.log(Level.WARNING, str);}
     public static void main(String[] args) {
+        if(args.length>0){
+            try{
+                Level l=Level.parse(args[0].toUpperCase());
+                logger.setLevel(l);
+                log("Nivel del logger situado en "+l.getName()+".");
+            } catch(IllegalArgumentException ex){
+                warning("Argumento #1 en el programa es inválido. Logger situado en INFO.");
+            }
+        }
         log("Iniciando DiscordUtils...");
         try {
             jda=buildJDA();

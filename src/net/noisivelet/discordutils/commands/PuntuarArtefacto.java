@@ -16,6 +16,7 @@ import static net.noisivelet.discordutils.DiscordUtils.EXECUTOR;
 import static net.noisivelet.discordutils.DiscordUtils.strToArray;
 import static net.noisivelet.discordutils.DiscordUtils.log;
 import net.noisivelet.discordutils.tasks.OCRProcessTask;
+import net.noisivelet.discordutils.utils.EmbededMessages;
 
 
 /**
@@ -67,7 +68,7 @@ public class PuntuarArtefacto extends Command{
             
         } else {
             if(msg_array.length==1){
-                event.getChannel().sendMessage("Error: Necesito una URL o una imagen adjunta para poder puntuar el artefacto.").submit();
+                event.getChannel().sendMessage(EmbededMessages.infoMessage("!PuntuarArtefacto - Uso", "**Uso correcto: `!puntuarartefacto <url a una imagen> [idioma=es]`**\n\n- Puedes adjuntar un archivo al mensaje en lugar de poner una URL.\n- Para idioma, los valores admitidos son `en` (ingés) o `es` (español).\n- Tamaño máximo de la imagen: 1MB.\n\n*------*\n**Ejemplo:** `!puntuarartefacto https://cdn.discordapp.com/attachments/653597084318171169/790009265561010186/unknown.png en`")).submit();
                 return;
             }
             
@@ -79,7 +80,7 @@ public class PuntuarArtefacto extends Command{
                 URL imageUrl=new URL(url);
             } catch (MalformedURLException ex) {
                 log("Comando no ejecutado - URL malformada.");
-                event.getChannel().sendMessage("Error: La URL no es una URL correcta.").submit();
+                event.getChannel().sendMessage(EmbededMessages.errorMessage("URL incorrecta", "La URL que has introducido no es una URL correcta. Comprueba la escritura y vuelve a intentarlo.")).submit();
                 return;
             }
         }

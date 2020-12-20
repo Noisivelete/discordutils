@@ -224,12 +224,12 @@ public final class Artefacto {
         }
     }
     
-    private TipoArtefacto tipo;
+    private TipoArtefacto tipo=null;
     private Integer nivel=null;
     private ArtifactStat principal=null;
     private ArrayList<ArtifactStat> substats=new ArrayList<>();
     private String buffer_stat=null;
-
+    
     public Artefacto(String datos) throws UnsupportedOperationException{
         try (Scanner scanner = new Scanner(datos)) {
             while (scanner.hasNextLine()) {
@@ -243,6 +243,9 @@ public final class Artefacto {
                 }
                 
             }
+        }
+        if(faltanDatos()){
+            throw new UnsupportedOperationException("No se puede convertir este tipo de imagen a un artefacto.");
         }
         debug("Tipo: "+tipo.name());
         debug("Nivel: "+nivel);
@@ -411,12 +414,14 @@ public final class Artefacto {
             range=getSubstatRange(substat.stat);
             double sm=getSubstatScoreMultiplier(substat.stat);
             debug("Mult x"+sm);
-            double puntos=substat.cantidad/(Math.floor(nivel/4)+1)/range.value*sm;
-            int upgrade_times=(int)Math.floor(nivel/4)+1;
-            puntos*=(1+upgrade_times)/6;
+            int upgrade_times=(int)Math.floor(nivel/4);
+            debug(substat.cantidad +"/("+upgrade_times+"+1)/"+range.value+"*"+sm);
+            double puntos=substat.cantidad/(upgrade_times+1)/range.value*sm;
+            puntos*=(1+upgrade_times)/6.0;
+            debug("Puntos: "+puntos);
             score_ss.add(puntos);
             multiplier_ss.add(sm);
-            double perf_sc=substat.cantidad/(upgrade_times*range.value);
+            double perf_sc=substat.cantidad/((upgrade_times+1)*range.value);
             debug("Perfection score: "+perf_sc);
             perfection_score.add(perf_sc);
             val+="• **"+substat.stat.name()+"**: "+(int)(puntos*100)+" puntos\n";
@@ -463,7 +468,7 @@ public final class Artefacto {
                 .setTitle("Valoración de artefacto")
                 .addField("Tipo:", tipo.name(), true)
                 .addField("Nivel:", nivel+"", true)
-                .addField("Stat principal:", principal.stat.name()+": "+principal.cantidad, false)
+                .addField("Stat principal:", principal.stat.name()+": "+(float)principal.cantidad, false)
                 .addField("Substats:", subst, false)
                 .addBlankField(false)
                 .addField("Valoración:", val, false)
@@ -482,6 +487,28 @@ public final class Artefacto {
     private void addSubstat(String stat, String cantidad, boolean percent) throws IllegalArgumentException{
         if(substats.size()<4)
             setStat(stat, cantidad, percent, false);
+    }
+
+    private boolean faltanDatos() {
+        boolean _ret=false;
+        if(nivel==null){
+            debug("Falta el nivel.");
+            _ret=true;
+        }
+        if(principal==null){
+            debug("Falta el stat principal.");
+            _ret=true;
+        }
+        if(tipo==null){
+            debug("Falta el tipo de artefacto.");
+            _ret=true;
+        }
+        if(substats.isEmpty()){
+            debug("No hay substats.");
+            _ret=true;
+        }
+        return _ret;
+            
     }
     
     /**

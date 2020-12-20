@@ -10,13 +10,17 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.logging.Level;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import static net.noisivelet.discordutils.DiscordUtils.OCR_KEY;
 import static net.noisivelet.discordutils.DiscordUtils.debug;
 import static net.noisivelet.discordutils.DiscordUtils.debug2;
+import static net.noisivelet.discordutils.DiscordUtils.exception;
 import static net.noisivelet.discordutils.DiscordUtils.log;
 import static net.noisivelet.discordutils.DiscordUtils.warning;
 import net.noisivelet.discordutils.utils.Artefacto;
+import net.noisivelet.discordutils.utils.EmbededMessages;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -41,6 +45,9 @@ public class OCRProcessTask implements Runnable{
     
     @Override
     public void run() {
+        //Mensaje de espera
+        Message msg=event.getChannel().sendMessage(EmbededMessages.defaultArtifactEmbed()).complete();
+        
         StringBuilder content;
         try{
             //URL a la que hacer la consulta
@@ -68,7 +75,7 @@ public class OCRProcessTask implements Runnable{
             con.disconnect();
             
         } catch (IOException e){ 
-            event.getChannel().sendMessage("El servidor no responde. Normalmente, repetir el mensaje debería arreglar el problema. Si persiste, puede ser que el servidor de análisis de imágenes esté caído.").submit();
+            msg.editMessage(EmbededMessages.errorMessage("Error: El servidor no responde", "El servidor no responde. Normalmente, repetir el mensaje debería arreglar el problema. Si persiste, puede ser que el servidor de análisis de imágenes esté caído.")).submit();
             warning("No se han recibido datos de la respuesta. Error: "+e.getMessage());
             return;
         }
@@ -92,26 +99,24 @@ public class OCRProcessTask implements Runnable{
         switch(errorCode){
             case 1:
                 String texto=((JSONObject)((JSONArray)jo.get("ParsedResults")).get(0)).get("ParsedText").toString();
-                //event.getChannel().sendMessage(texto).submit();
+                debug2(texto);
                 
                 //Crear un objeto Artefacto con los datos obtenidos y obtener la valoración
                 Artefacto a;
                 try{
                     a=new Artefacto(texto);
-                    debug2(texto);
-                } catch(UnsupportedOperationException ex){
-                    event.getChannel().sendMessage("Error: Formato no soportado. Por favor, asegúrate de que NO has cogido la imagen de la ventana de subida de nivel de artefacto, pues no están soportadas.").submit();
+                } catch(Exception ex){
+                    msg.editMessage(EmbededMessages.errorMessage("Error leyendo imagen", "No se ha podido leer la imagen. Prueba a sacar un pantallazo del artefacto desde tu bolsa. Normalmente, esos artefactos se leen más facilmente.")).submit();
                     return;
                 }
-                
-                event.getChannel().sendMessage(a.getValoracion()).submit();
+                msg.editMessage(a.getValoracion()).submit();
                 
                 break;
             case 3:
-                event.getChannel().sendMessage("La imagen es demasiado grande. Solo se permiten imágenes de un máximo de 1024KB (1MB).").submit();
+                msg.editMessage(EmbededMessages.errorMessage("Error: Imagen demasiado grande", "La imagen es demasiado grande. Solo se permiten imágenes de un máximo de 1024KB (1MB).")).submit();
                 break;
             default:
-                event.getChannel().sendMessage("Error procesando la imagen. Código de error: "+errorCode).submit();
+                msg.editMessage(EmbededMessages.errorMessage("Error de procesamiento", "No se ha podido procesar la imagen. Código de error: "+errorCode)).submit();
         }
         
         
