@@ -6,9 +6,12 @@
             <file>file:/S:/Documentos/NetBeansProjects/DiscordUtils/src/net/noisivelet/discordutils/commands/Test.java</file>
             <file>file:/S:/Documentos/NetBeansProjects/DiscordUtils/src/net/noisivelet/discordutils/DiscordUtils.java</file>
             <file>file:/S:/Documentos/NetBeansProjects/DiscordUtils/src/net/noisivelet/discordutils/listener/CommandListener.java</file>
+            <file>file:/S:/Documentos/NetBeansProjects/DiscordUtils/src/net/noisivelet/discordutils/commands/PuntuarArtefacto.java</file>
             <file>file:/S:/Documentos/NetBeansProjects/DiscordUtils/src/net/noisivelet/discordutils/utils/Artefacto.java</file>
+            <file>file:/S:/Documentos/NetBeansProjects/DiscordUtils/src/net/noisivelet/discordutils/utils/EmbededMessages.java</file>
             <file>file:/S:/Documentos/NetBeansProjects/DiscordUtils/src/net/noisivelet/discordutils/commands/LimpiarPins.java</file>
             <file>file:/S:/Documentos/NetBeansProjects/DiscordUtils/src/net/noisivelet/discordutils/tasks/OCRProcessTask.java</file>
+            <file>file:/S:/Documentos/NetBeansProjects/DiscordUtils/src/net/noisivelet/discordutils/commands/Command.java</file>
         </group>
     </open-files>
 </project-private>

@@ -555,9 +555,11 @@ public final class Artefacto {
                     
                 case "Energy Recharge":
                 case "Recarga de Energía":
+                case "Recarga de Energia":
                     return ENERGY_RECHARGE;
                     
                 case "Maestría Elemental":
+                case "Maestria Elemental":
                 case "Elemental Mastery":
                     return ELEMENTAL_MASTERY;
                     
@@ -571,6 +573,7 @@ public final class Artefacto {
                     
                 case "Healing Bonus":
                 case "Bono de Curación":
+                case "Bono de Curacion":
                     return HEALING_BONUS;
                     
                 case "Hydro DMG Bonus":
