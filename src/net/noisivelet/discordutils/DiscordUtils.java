@@ -37,7 +37,7 @@ public class DiscordUtils {
     public static final ExecutorService EXECUTOR=Executors.newCachedThreadPool();
     public static JDA jda=null;
     public static final HashMap<String, Command> COMANDOS=new HashMap<>();
-    public static final String VERSION="DiscordUtils v0.0";
+    public static final String VERSION="DiscordUtils v1.0";
     public static String OCR_KEY=null;
     static{
         System.setProperty("java.util.logging.SimpleFormatter.format",
